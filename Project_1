@@ -1,9 +1,0 @@
-project_1/
-|-data/
-|  |- .gitkeep
-|-scripts/
-|  |- .gitkeep
-|-results/
-|  |- .gitkeep
-|-README.md
-|-.gitignore
