@@ -1,0 +1,43 @@
+---
+title: 'BIOS 611: Project 1'
+author: "Wonkyung Jang"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Rename and keep only meaningful variables
+```{r echo=FALSE}
+data <- read.table(file = 'UMD_Services_Provided_20190719.txt', sep = '\t', fill = TRUE, header = TRUE)
+summary(data)
+library(tidyverse)
+data.analysis <- data %>%
+  rename(Client = Client.File.Number, Bus = Bus.Tickets..Number.of., Food = Food.Provided.for, 
+         Clothing = Clothing.Items) %>%
+  select(Client, Bus, Food, Food.Pounds, Clothing, Diapers, School.Kits, Hygiene.Kits,    
+         Financial.Support)
+head(data.analysis)
+```
+
+# Clustering 
+Clustering clients based on Bus, Food, Food.Pounds, Clothing, Diapers, School.Kits, Hygiene.Kits, Financial.Support using k-means and place into 3 groups: high needs, moderate needs, low needs.
+```{r echo=FALSE}
+library(mclust) 
+data.analysis.cluster <- data.analysis %>%
+  select(Bus, Food, Food.Pounds, Clothing, Diapers, School.Kits, Hygiene.Kits, Financial.Support) %>%
+  kmeans(3)
+```
+
+Plot results as a scatter plot by Bus and Food colored by cluster assignment
+```{r echo=FALSE}
+library(ggplot2)
+data.analysis$cluster = as.factor(data.analysis.cluster$cluster)
+ggplot(data.analysis, aes(Bus, Food, group = cluster)) +
+  geom_point(size = 2, alpha = 0.75, aes(color = cluster))
+```
+
+# Classification
+First, the data was separated into training and test sets. I then used two approaches to prediction. The first was to predict the actual quantity of food each client will call for using regression techniques. The second was to identify which clients will improve year over year using classification techniques.
+
+# Regression
+To solve our regression problem of developing a tool that will allow me to predict a client's food needs in the next season given their previous season's statistics, I used LASSO regression with the main effects and the interaction terms.
