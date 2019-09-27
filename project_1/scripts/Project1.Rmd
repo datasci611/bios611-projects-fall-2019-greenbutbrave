@@ -46,8 +46,8 @@ ggplot(data.analysis, aes(Bus, Food, group = cluster)) +
   geom_point(size = 2, alpha = 0.75, aes(color = cluster))
 ```
 
-# Classification
+# Classification (Ongoing)
 First, the data was separated into training and test sets. I then used two approaches to prediction. The first was to predict the actual quantity of food each client will call for using regression techniques. The second was to identify which clients will improve year over year using classification techniques.
 
-# Regression
+# LASSO Regression (Ongoing) 
 To solve our regression problem of developing a tool that will allow me to predict a client's food needs in the next season given their previous season's statistics, I used LASSO regression with the main effects and the interaction terms.
