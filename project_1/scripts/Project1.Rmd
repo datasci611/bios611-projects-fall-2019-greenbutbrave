@@ -19,6 +19,17 @@ data.analysis <- data %>%
 head(data.analysis)
 ```
 
+# Visualization
+```{r echo=FALSE}
+library(ggplot2)
+ggplot(data.analysis, aes(x = Food, y = Clothing)) +
+  geom_point() 
+ggplot(data.analysis, aes(x = Food, y = Diapers)) +
+  geom_point() 
+ggplot(data.analysis, aes(x = Food, y = Financial.Support)) +
+  geom_point() 
+```
+
 # Clustering 
 Clustering clients based on Bus, Food, Food.Pounds, Clothing, Diapers, School.Kits, Hygiene.Kits, Financial.Support using k-means and place into 3 groups: high needs, moderate needs, low needs.
 ```{r echo=FALSE}
@@ -30,7 +41,6 @@ data.analysis.cluster <- data.analysis %>%
 
 Plot results as a scatter plot by Bus and Food colored by cluster assignment
 ```{r echo=FALSE}
-library(ggplot2)
 data.analysis$cluster = as.factor(data.analysis.cluster$cluster)
 ggplot(data.analysis, aes(Bus, Food, group = cluster)) +
   geom_point(size = 2, alpha = 0.75, aes(color = cluster))
