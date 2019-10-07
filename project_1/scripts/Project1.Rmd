@@ -2,8 +2,8 @@
 title: 'BIOS 611: Project 1'
 author: "Wonkyung Jang"
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document: default
 ---
 
@@ -88,7 +88,7 @@ boxplot(data$Bus, data$Food, data$Food.Pounds, data$Cloth, data$Diapers, data$Sc
 
 - Bus
 According to the box-plot and rosnertest, I got 4 outliers greater than or equal to 7. Particularly, through the rosnertest, I could get rows in which the outliers are and the actual values of the outliers.
-```{r, warning=FALSE, results = 'hide'}
+```{r warning=FALSE}
 summary(data$Bus)
 boxplot(data$Bus, outcol = "red", outcex = 1.5, xlab = "Bus", ylab = "Value", col = "cyan", border = "Blue")
 rosnerTest(data$Bus, k = 10, warn = F)
@@ -183,8 +183,7 @@ client.data = data %>%
   separate(Date, sep = "-", into = c("Year", "Month", "Day")) 
 ggplot(data = client.data) +
   geom_bar(mapping = aes(x = Year, fill = Year)) +
-  labs(title = "Number of Clients by Year") +
-  theme(legend.position = "none")
+  labs(title = "Number of Clients by Year")
 ```
 
 2.The number of new clients served by UMD between 1994 and 2019
@@ -198,8 +197,7 @@ client.data = data %>%
   distinct(ClientID, .keep_all = TRUE) 
 ggplot(data = client.data) +
   geom_bar(mapping = aes(x = Year, fill = Year)) +
-  labs(title = "Number of New Clients by Year") +
-  theme(legend.position = "none")
+  labs(title = "Number of New Clients by Year") 
 ```
 The number of new clients served by UMD had been increasing until 2002 but has been decreasing up to now.
 
