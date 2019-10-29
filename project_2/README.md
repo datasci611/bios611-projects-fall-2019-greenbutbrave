@@ -17,7 +17,7 @@ The dataset is offered by the Urban Ministries of Durham (UMD) Project Team (htt
 * Hygiene Kits: # of kits received per individual or family. Kits contain soap, shampoo, conditioner, lotion, deodorant, a toothbrush, toothpaste, a washcloth, a disposable razor, and a bottle of shaving cream.
 * Financial Support: Service discontinued
 
-### Shiny Dashboard Project
+## Shiny Dashboard Project
 
 * Data management
 
@@ -27,4 +27,14 @@ After importing the data, I renamed the variables and remove some rows with date
 
 In the presentation, the social workers said they are particularly interested in “which clients they can help make a permanent transition to self-sufficiency, and which clients continue to need help.” In this context, I suggest they perform analyses to find some hidden patterns and differences between different types of clients with fine-grained dataset.
 
-Shiny is an R package that makes it easy to build interactive web apps straight from R. I will build my web app dashboard using Shiny and R, to visualize: 1) The Number of (New) Clients Served by UMD; 2) Duration of Assistance; and 3) Seasonality.
+Shiny is an R package that makes it easy to build interactive web apps straight from R. I will build my web app dashboard using Shiny and R, to visualize the dataset and derive some implications for the practice and research: 
+
+* 1) RQ 1: Do outliers matter in terms of distribution?; 
+* 2) RQ 2: Are there seasonalities from 2011-2019?; 
+* 3) RQ 3: Are there differences between seasonalities from 2000-2010 and seasonalities from 2011-2019?; and 
+* 4) RQ 4: Do outliers matter in terms of correlation?.
+
+* Shiny URL
+
+https://wkjang.shinyapps.io/project_2/
+

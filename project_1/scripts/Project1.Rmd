@@ -116,7 +116,7 @@ boxplot(data$Food, main = "Food: After removing the outliers", xlab = "Food", yl
 According to the box-plot and rosnertest, I got 1 outlier greater than or equal to 200. 
 ```{r, warning=FALSE, results = 'hide'}
 summary(data$Food.Pounds)
-boxplot(data$Food.Pounds, outcol = "red", outcex = 1.5, xlab = "Food.Pounds", ylab = "Value", col = "cyan", border = "Blue")
+boxplot(data1$Food.Pounds, outcol = "red", outcex = 1.5, xlab = "Food.Pounds", ylab = "Value", col = "cyan", border = "Blue")
 rosnerTest(data$Food.Pounds, k = 5, warn = F)
 ```
 The outliers were excluded.
