@@ -16,4 +16,6 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     formatR \
     remotes \
     selectr \
-    BiocManager
+    BiocManager \
+
+ENV PATH="/scripts:${PATH}"

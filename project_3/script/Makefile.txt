@@ -1,0 +1,6 @@
+build-image: Dockerfile.txt
+	docker build -t wj -f Dockerfile.txt .
+
+output-jpeg: build-image
+	docker run -it --rm -v $(shell pwd):/output -w /output wj rocker/tidyverse \
+	Rscript project3.R
