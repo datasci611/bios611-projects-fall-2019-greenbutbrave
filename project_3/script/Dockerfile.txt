@@ -12,10 +12,13 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     --deps TRUE \
     tidyverse \
     dplyr \
-    devtools \
-    formatR \
-    remotes \
-    selectr \
-    BiocManager \
+    tidyr \
+    caret \
+    ggplot2 \
+    GGally \
+    ISLR \
+    glmnet \
+    jtools \
+    interactions \
 
 ENV PATH="/scripts:${PATH}"

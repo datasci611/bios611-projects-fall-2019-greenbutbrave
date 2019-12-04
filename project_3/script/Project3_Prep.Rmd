@@ -1,0 +1,209 @@
+---
+title: "BIOS 611: Project 3"
+author: "Wonkyung Jang"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+## Background: What is "The Urban Ministries of Durham (UMD) Project"?
+The Urban Ministries of Durham (UMD) Project aims for connecting with the community to diminish homelessness and fighting poverty through providing food, shelter and a future to neighbors with special needs (UMD, 2019). Through exploring some hidden patterns and trends of the data using visualization and data mining, this paper will suggest what evidence social workers can glean from this data and help them better understand their clients and services.
+
+## Data Cited
+The dataset is offered by the Urban Ministries of Durham (UMD) Project Team (http://www.umdurham.org/), which includes the dataset with 2513 observations. It has 11 variables like below: 
+
+### Variables
+
+1. ID: Client ID (Identifier)
+
+2. Age: Years (18-81)
+
+3. Gender: Male, Female, Trans Female
+
+4. Race: White, Black/African American, American Indian or Alaska Native, Native Hawaiian/Pacific Islander
+
+5. Ethnicity: Non-Hispanic/Non-Latino, Hispanic/Latino
+
+6. Veteran: Yes, No
+
+7. Income_Monthly: Monthly Income (0-5000)
+
+8. Disability: Yes, No
+
+9. HealthInsurance: Yes, No
+
+10. DomesticViolence: Yes, No
+
+11. Time: Time in UMD (0-1008)
+
+```{r, warning=FALSE, results = 'hide'}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(caret)
+library(ggplot2)
+library(GGally)
+library(ISLR) 
+library(glmnet) 
+library(jtools) 
+library(interactions)
+```
+
+## Data Visualizations
+
+1. Import the data 
+```{r, warning=FALSE, results = 'hide'}
+data <- read.csv('final_data.csv')
+data_demo <- read.csv('final_data_demo.csv')
+```
+
+2. Bar Plot (by Gender & Race)
+
+The majority of UMD populations are Black/African Americans, followed by Whites. There are several American Indians/Alaska Natives and Native Hawaiians/Pacific Islanders. 
+```{r warning=FALSE}
+a <- ggplot(data_demo, aes(Gender)) 
+a + geom_bar(aes(fill = Race)) +
+  labs(title="Bar Plot",
+       subtitle="Gender and Race in UMD",
+       caption="Source: Urban Ministries of Durham",
+       x="Race",
+       y="Frequency")
+```
+
+3. Density Plot (Time in UMD & Gender)
+Males are likely to spend more time in UMD, compared to Females and Trans-females. It is notable that there are fluctuations in the distributions. For instance, the Trans-females's Time in UMD distribution shows a bimodal distribution: they are prone to stay in UMD for either 15-20 days or 110-125 days.
+```{r warning=FALSE}
+b <- ggplot(data, aes(Time, fill = Gender, colour = Gender))
+b + geom_density(alpha = 0.1) +
+  labs(title="Density Plot",
+       subtitle="Gender and Time in UMD",
+       caption="Source: Urban Ministries of Durham",
+       x="Time",
+       y="Density")
+```
+
+4. Box Plot (Time in UMD & (Race X Gender))
+In terms of Time in UMD, it is important to consider differences between race by gender. In the African American population, males spend more days in UMD than females. On the other hand, in the White population, females are likely to stay more days in UMD.  
+```{r warning=FALSE}
+c <- ggplot(data, aes(Race, Time)) 
+c + geom_boxplot(aes(colour = Gender)) +
+  labs(title="Box Plot",
+       subtitle="(Race X Gender) and Time in UMD",
+       caption="Source: Urban Ministries of Durham",
+       x="Race",
+       y="Frequency")
+```
+
+5. Box Plot (Monthly income & (Race X Gender))
+In terms of monthly income, males tend to earn more money than females. The interesting thing is, the variance of African American females is larger than that of White females.   
+```{r warning=FALSE}
+d <- ggplot(data, aes(Race, Income_Monthly)) 
+d + geom_boxplot(aes(colour = Gender)) +
+  labs(title="Box Plot",
+       subtitle="(Race X Gender) and Monthly Income",
+       caption="Source: Urban Ministries of Durham",
+       x="Race",
+       y="Frequency")
+```
+
+6. Scatter Plot and Density Plot (Time & Income & Age)
+Age shows normal distribution, whose average is 50 (years old). There is a significant correlation between age and Time in UMD.  
+```{r, warning=FALSE, results = 'hide'}
+vars = c("Time", "Income_Monthly", "Age")
+data2 <- data[,c(vars)]
+drop_na(data2)
+```
+```{r warning=FALSE}
+ggpairs(data2, progress = FALSE, 
+        upper = list(continuous = "cor"),
+        lower = list(continuous = "density"))
+```
+
+7. Scatter Plot and Density Plot (Gender X (Time & Income & Age))
+It is crucial to check if correlations between Age and Time vary by gender. Females show the greater correlation (0.2) than males (0.148).  
+```{r, warning=FALSE, results = 'hide'}
+vars1 = c("Time", "Income_Monthly", "Age", "Gender")
+data3 <- data[,c(vars1)]
+drop_na(data3)
+```
+```{r warning=FALSE}
+ggpairs(data3, columns=1:3, ggplot2::aes(colour=Gender),
+        upper = list(continuous = "cor", combo = "box_no_facet"),
+        lower = list(continuous = "density", combo = "dot_no_facet"),
+        diag = list(continuous = "densityDiag"))
+```
+
+8. Scatter Plot and Density Plot (Gender X (Time & Income & Age))
+```{r, warning=FALSE, results = 'hide'}
+vars1 = c("Time", "Income_Monthly", "Age", "Gender")
+data3 <- data[,c(vars1)]
+drop_na(data3)
+```
+```{r warning=FALSE}
+ggpairs(data3, ggplot2::aes(colour=Gender),
+        upper = list(continuous = "density", combo = "dot_no_facet"),
+        lower = list(continuous = "cor", combo = "box_no_facet"),
+        diag = list(continuous = "densityDiag"))
+```
+
+## Data Analyses
+
+1. LASSO
+I explored the possibility that the regression model omitted important interaction and quadratic terms using the Least Absolute Shrinkage and Selection Operator (LASSO) approach. LASSO, one of the machine learning techniques, is used to enhance the precision and interpretability of regression models by changing the model fitting process to identify the best fitting subset of the provided covariates in the final model (Santosa, & Symes, 1986; Tibshirani, 1996). As a regularized (penalized) regression method, LASSO uses an L1 penalty for both fitting and penalization of the coefficients based on Breiman's nonnegative garrote (Breiman, 1995). 
+```{r warning=FALSE}
+Variables = c("Age","Gender","Race","Ethnicity","Veteran","Income_Monthly","Disability","HealthInsurance","DomesticViolence","Time")
+Variables_ <- data[,c(Variables)]
+### Splitting data into training and testing data
+x = model.matrix(Time~.^2, Variables_)[,-1]
+y = Variables_ %>% select(Time) %>% unlist() %>% as.numeric()
+train = Variables_ %>% sample_frac(0.5)
+test = Variables_ %>% setdiff(train)
+x_train = model.matrix(Time~., train)[,-1]
+x_test = model.matrix(Time~., test)[,-1]
+y_train = train %>% select(Time) %>% unlist() %>% as.numeric()
+y_test = test %>% select(Time) %>% unlist() %>% as.numeric()
+### Fit LASSO model on training data and evaluate the model (lamda) on testing data
+lasso_mod = glmnet(x_train, y_train, alpha = 1) # Fit lasso model on training data
+plot(lasso_mod)    # Draw plot of coefficients
+cv.out = cv.glmnet(x_train, y_train, alpha = 1) # Fit lasso model on training data
+plot(cv.out) # Draw plot of training MSE as a function of lambda
+bestlam = cv.out$lambda.min # Select lamda that minimizes training MSE
+lasso_pred = predict(lasso_mod, s = bestlam, newx = x_test) # Use best lambda to predict test data
+mean((lasso_pred - y_test)^2) # Calculate test MSE
+### LASSO Outcomes
+out = glmnet(x, y, alpha = 1) # Fit lasso model on full dataset
+lasso_coef = predict(out, type = "coefficients", s = bestlam)[1:40,] # Display coefficients using lambda chosen by CV
+lasso_coef[lasso_coef != 0] # Display only non-zero coefficients
+```
+
+2. Interaction Plots
+The effects of Age on Time in UMD vary by Race. Whites show the largest slope, compared to Black/African Americans.
+```{r warning=FALSE}
+interaction1 <- lm(Time ~ Age * Race , data = data)
+interact_plot(interaction1, pred = Age, modx = Race)
+```
+
+The effects of Age on Time in UMD vary by Health Insurance. People who doesn't have Health Insurance show the larger slope, compared to people with Health Insurance.
+```{r warning=FALSE}
+interaction2 <- lm(Time ~ Age * HealthInsurance , data = data)
+interact_plot(interaction2, pred = Age, modx = HealthInsurance)
+```
+
+The effects of Age on Time in UMD vary by Monthly Income. People with lower income show the larger slope, compared to people with Health Insurance.
+```{r warning=FALSE}
+interaction3 <- lm(Time ~ Age * Income_Monthly , data = data)
+interact_plot(interaction3, pred = Age, modx = Income_Monthly)
+```
+
+### Conclusion
+
+Males are likely to spend more time in UMD, compared to Females and Trans-females. It is notable that there are fluctuations in the distributions. For instance, the Trans-females's Time in UMD distribution shows a bimodal distribution: they are prone to stay in UMD for either 15-20 days or 110-125 days.
+
+In terms of Time in UMD, it is important to consider differences between race by gender. In the African American population, males spend more days in UMD than females. On the other hand, in the White population, females are likely to stay more days in UMD. 
+
+In terms of monthly income, males tend to earn more money than females. The interesting thing is, the variance of African American females is larger than that of White females. 
+
+There is a significant correlation between age and Time in UMD.  Females show the greater correlation (0.2) than males (0.148).  
+
+The effects of Age on Time in UMD vary by Race. Whites show the largest slope, compared to Black/African Americans. The effects of Age on Time in UMD vary by Health Insurance and monthly income.
